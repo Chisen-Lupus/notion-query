@@ -1,4 +1,7 @@
 import requests, json, os
+from PIL import Image
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Query():
 
@@ -88,6 +91,30 @@ class Query():
 
         return outpaths
 
+    @classmethod
+    def display_single_image(cls, path):
+        # Open the image using Pillow
+        img = Image.open(path)
+
+        # Display the image
+        plt.imshow(img)
+        plt.axis('off')  # Hide axes
+        plt.show()
+
+    @classmethod
+    def display_multiple_images(cls, paths):
+        img_count = len(paths)
+        grid = int(np.ceil(np.sqrt(img_count)))
+        fig, axs = plt.subplots(grid, grid)
+        axs = axs.flat
+        for i in range(len(axs)):
+            if i<img_count:
+                path = paths[i]
+                img = Image.open(path)
+                axs[i].imshow(img)
+            axs[i].axis('off')  # Hide axes
+        plt.tight_layout()
+        plt.show()
 
 
 
