@@ -123,4 +123,5 @@ class Query():
 
 
 
-# TODO: needs a image display function
+# TODO: 增量备份??
+# IDEA: 搞个file explorer出来??
