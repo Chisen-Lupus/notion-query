@@ -24,7 +24,7 @@ class Query():
         }
 
     @staticmethod
-    def is_page_selected(page, criteria):
+    def is_page_selected(page, filters):
         """
         Check if a page matches the selection criteria.
         Args:
@@ -33,7 +33,7 @@ class Query():
         Returns:
             bool: True if the page matches all criteria, False otherwise.
         """
-        for key, expected_value in criteria.items():
+        for key, expected_value in filters.items():
             prop = page['properties'].get(key)
             if not prop:
                 return False
@@ -43,8 +43,17 @@ class Query():
                 return False
         return True
 
+    @staticmethod
+    def is_block_selected(block, filters):
+        for key, expected_value in filters.items():
+            prop = block.get(key)
+            if not prop:
+                return False
+            if key=='type' and prop!=expected_value:
+                return False
+        return True
 
-    def get_page_list(self, num_pages=None, database_id=None, filter=None):
+    def get_page_list(self, num_pages=None, database_id=None, filters=None):
         """
         If num_pages is None, get all pages, otherwise just the defined number.
         """
@@ -54,34 +63,38 @@ class Query():
         page_size = 100 if get_all else num_pages
         payload = {"page_size": page_size}
         response = requests.post(url, json=payload, headers=self.__headers)
-        data = response.json()
-        results = data["results"]
-        if filter: 
-            results = [page for page in results if self.is_page_selected(page, filter)]
-
+        if response.status_code == 200:
+            data = response.json()
+            results = data["results"]
+            if filters: 
+                results = [page for page in results if self.is_page_selected(page, filters)]
+            return results
+        else:
+            print(f"Failed to retrieve page content: {response.status_code}")
+            print(response.text)  
+            return
+            
         # while data["has_more"] and get_all:
         #     payload = {"page_size": page_size, "start_cursor": data["next_cursor"]}
         #     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
         #     response = requests.post(url, json=payload, headers=self.__headers)
         #     data = response.json()
         #     results.extend(data["results"])
-
-        return results
     
-    def get_block_list(self, page_id=None):
+    def get_block_list(self, page_id=None, filters=None):
         PAGE_ID = page_id if page_id else self.PAGE_ID
         children_url = f'https://api.notion.com/v1/blocks/{PAGE_ID}/children'
-        # Send the GET request to retrieve the page content (blocks)
         response = requests.get(children_url, headers=self.__headers)
-        # Check if the request was successful
         if response.status_code == 200:
-            # Parse the JSON response
             content_data = response.json()
             # print(json.dumps(content_data, indent=4))  # Pretty-print the page content
-            return content_data
+            results = content_data['results']
+            if filters: 
+                results = [block for block in results if self.is_block_selected(block, filters)]
+            return results
         else:
             print(f"Failed to retrieve page content: {response.status_code}")
-            print(response.text)  # Print error details
+            print(response.text) 
             return
     
     def get_file_url_list(self, content_data):

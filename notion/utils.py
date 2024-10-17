@@ -26,3 +26,8 @@ def display_multiple_images(paths):
     plt.tight_layout()
     plt.show()
 
+def get_page_id(page): 
+    page_url = page['url']
+    page_id = page_url.split('/')[-1].split('-')[-1]
+    # page_url = f'https://api.notion.com/v1/pages/{page_id}'
+    return page_id
