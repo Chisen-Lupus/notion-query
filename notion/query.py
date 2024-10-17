@@ -23,7 +23,28 @@ class Query():
             "Notion-Version": "2022-06-28",
         }
 
-    def get_page_list(self, num_pages=None, database_id=None):
+    @staticmethod
+    def is_page_selected(page, criteria):
+        """
+        Check if a page matches the selection criteria.
+        Args:
+            page (dict): The page data containing properties.
+            criteria (dict): The selection criteria with keys as property names and values as the expected value.
+        Returns:
+            bool: True if the page matches all criteria, False otherwise.
+        """
+        for key, expected_value in criteria.items():
+            prop = page['properties'].get(key)
+            if not prop:
+                return False
+            if prop['type']=='select' and prop['select']['name']!=expected_value:
+                return False
+            if prop['type']=='status' and prop['status']['name']!=expected_value:
+                return False
+        return True
+
+
+    def get_page_list(self, num_pages=None, database_id=None, filter=None):
         """
         If num_pages is None, get all pages, otherwise just the defined number.
         """
@@ -35,6 +56,8 @@ class Query():
         response = requests.post(url, json=payload, headers=self.__headers)
         data = response.json()
         results = data["results"]
+        if filter: 
+            results = [page for page in results if self.is_page_selected(page, filter)]
 
         # while data["has_more"] and get_all:
         #     payload = {"page_size": page_size, "start_cursor": data["next_cursor"]}
