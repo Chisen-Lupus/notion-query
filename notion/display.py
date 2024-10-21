@@ -3,6 +3,16 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 
+def setup_matplotlib_inline():
+    try:
+        from IPython import get_ipython
+        ipython = get_ipython()
+        if ipython is not None:
+            ipython.run_line_magic('matplotlib', 'inline')
+            ipython.run_line_magic('config', "InlineBackend.figure_format = 'retina'")
+    except ImportError:
+        print("IPython is not installed. Please install it to use this feature.")
+
 def display_single_image(path):
     # Open the image using Pillow
     img = Image.open(path)
