@@ -53,7 +53,7 @@ class Query():
                 return False
         return True
 
-    def get_page_list(self, num_pages=None, database_id=None, filters=None):
+    def get_pages(self, num_pages=None, database_id=None, filters=None):
         """
         If num_pages is None, get all pages, otherwise just the defined number.
         """
@@ -81,7 +81,7 @@ class Query():
         #     data = response.json()
         #     results.extend(data["results"])
     
-    def get_block_list(self, page_id=None, filters=None):
+    def get_blocks(self, page_id=None, filters=None):
         PAGE_ID = page_id if page_id else self.PAGE_ID
         children_url = f'https://api.notion.com/v1/blocks/{PAGE_ID}/children'
         response = requests.get(children_url, headers=self.__headers)
