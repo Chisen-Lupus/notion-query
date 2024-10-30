@@ -1,4 +1,5 @@
 import requests, os
+from dateutil import parser
     
 def get_file_urls(page_header):
     file_urls = []
@@ -46,3 +47,11 @@ def get_page_id(page_header):
 def get_page_title(page_header):
     page_title = page_header['properties']['Name']['title'][0]['plain_text']
     return page_title
+
+def get_block_times(blocks):
+    last_edited_times = [parser.parse(block['last_edited_time']) for block in blocks]
+    return last_edited_times
+
+def get_url_extensions(urls):
+    extensions = [url.split('?')[0].split('.')[-1] for url in urls]
+    return extensions
