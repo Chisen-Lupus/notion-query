@@ -20,15 +20,15 @@ def get_image_urls(page):
             file_urls.append(file_url)
     return file_urls
 
-def download_file(file_name, file_url, outdir):
+def download_file(file_name, file_url, outdir, verbose=True):
     response = requests.get(file_url)
     if response.status_code == 200:
         outpath = os.path.join(outdir, file_name)
         with open(outpath, "wb") as file:
             file.write(response.content)
-        print(f"File '{file_name}' downloaded successfully!")
+        if verbose: print(f"File '{file_name}' downloaded successfully!")
     else:
-        print(f"Failed to download file: {response.status_code}")
+        if verbose: print(f"Failed to download file: {response.status_code}")
     return outpath
 
 def download_files(file_names, file_urls, outdir):
