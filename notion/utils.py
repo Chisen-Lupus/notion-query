@@ -44,8 +44,8 @@ def get_page_id(page_header):
     # page_url = f'https://api.notion.com/v1/pages/{page_id}'
     return page_id
 
-def get_page_title(page_header):
-    page_title = page_header['properties']['Name']['title'][0]['plain_text']
+def get_page_title(page_header, name_property='Name'):
+    page_title = page_header['properties'][name_property]['title'][0]['plain_text']
     return page_title
 
 def get_block_times(blocks):
