@@ -31,10 +31,10 @@ def download_file(file_name, file_url, outdir, verbose=True):
         if verbose: print(f"Failed to download file: {response.status_code}")
     return outpath
 
-def download_files(file_names, file_urls, outdir):
+def download_files(file_names, file_urls, outdir, verbose=True):
     outpaths = []
     for file_name, file_url in zip(file_names, file_urls):
-        outpath = download_file(file_name, file_url, outdir)
+        outpath = download_file(file_name, file_url, outdir, verbose)
         outpaths.append(outpath)
     return outpaths
 
