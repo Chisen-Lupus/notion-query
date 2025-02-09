@@ -60,19 +60,29 @@ class Query():
         DATABASE_ID = database_id if database_id else self.DATABASE_ID
         url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
         get_all = num_pages is None
-        page_size = 10000 if get_all else num_pages
+        page_size = 100  # Notion has a hard limit of 100 per request
         payload = {"page_size": page_size}
-        response = requests.post(url, json=payload, headers=self.__headers)
-        if response.status_code == 200:
+        results = []
+        while True:
+            response = requests.post(url, json=payload, headers=self.__headers)
+            if response.status_code!=200:
+                print(f"Failed to retrieve page content: {response.status_code}")
+                print(response.text)  
+                return
             data = response.json()
-            results = data["results"]
-            if filters: 
+            results.extend(data["results"])
+            # Apply filters if provided
+            if filters:
                 results = [page for page in results if self.is_page_selected(page, filters)]
-            return results
-        else:
-            print(f"Failed to retrieve page content: {response.status_code}")
-            print(response.text)  
-            return
+            # Stop if we've reached the requested number of pages
+            if not get_all and len(results) >= num_pages:
+                return results[:num_pages]
+            # Check for more pages
+            if data.get("has_more"):
+                payload["start_cursor"] = data["next_cursor"]
+            else:
+                break
+        return results
             
         # while data["has_more"] and get_all:
         #     payload = {"page_size": page_size, "start_cursor": data["next_cursor"]}
@@ -85,7 +95,7 @@ class Query():
         PAGE_ID = page_id if page_id else self.PAGE_ID
         children_url = f'https://api.notion.com/v1/blocks/{PAGE_ID}/children'
         response = requests.get(children_url, headers=self.__headers)
-        if response.status_code == 200:
+        if response.status_code==200:
             content_data = response.json()
             # print(json.dumps(content_data, indent=4))  # Pretty-print the page content
             results = content_data['results']
