@@ -22,14 +22,15 @@ def get_image_urls(page):
 
 def download_file(file_name, file_url, outdir, verbose=True):
     response = requests.get(file_url)
-    if response.status_code == 200:
+    if response.status_code==200:
         outpath = os.path.join(outdir, file_name)
         with open(outpath, "wb") as file:
             file.write(response.content)
         if verbose: print(f"File '{file_name}' downloaded successfully!")
+        return outpath
     else:
         if verbose: print(f"Failed to download file: {response.status_code}")
-    return outpath
+        return None
 
 def download_files(file_names, file_urls, outdir, verbose=True):
     outpaths = []
