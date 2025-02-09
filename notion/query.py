@@ -60,7 +60,8 @@ class Query():
         DATABASE_ID = database_id if database_id else self.DATABASE_ID
         url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
         get_all = num_pages is None
-        payload = {} if get_all else {"page_size": num_pages}
+        page_size = 10000 if get_all else num_pages
+        payload = {"page_size": page_size}
         response = requests.post(url, json=payload, headers=self.__headers)
         if response.status_code == 200:
             data = response.json()
